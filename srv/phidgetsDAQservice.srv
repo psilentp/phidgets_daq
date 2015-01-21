@@ -1,0 +1,4 @@
+string channel
+---
+float64 time
+float64 value

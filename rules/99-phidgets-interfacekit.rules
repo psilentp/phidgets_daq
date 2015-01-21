@@ -1,0 +1,1 @@
+SUBSYSTEM=="usb", ATTRS{idVendor}=="06c2", ATTRS{idProduct}=="0045", GROUP="plugdev", SYMLINK+="phidgetsinterface", MODE:="0666"
