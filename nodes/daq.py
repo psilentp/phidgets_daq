@@ -6,7 +6,8 @@ import roslib
 import rospy
 import rosparam
 from std_msgs.msg import Float32
-from phidgets_daq.msg import phidgetsDAQmsg
+from phidgets_daq.msg import phidgetsDAQmsg, phidgetsDigitalOutput
+from phidgets_daq.srv import phidgetsDAQchannelnames
 
 #Basic imports
 from ctypes import *
@@ -20,7 +21,6 @@ from Phidgets.PhidgetException import PhidgetErrorCodes, PhidgetException
 from Phidgets.Events.Events import AttachEventArgs, DetachEventArgs, ErrorEventArgs, InputChangeEventArgs, OutputChangeEventArgs, SensorChangeEventArgs
 from Phidgets.Devices.InterfaceKit import InterfaceKit
 
-
 ###############################################################################
 ###############################################################################
 class PhidgetsDAQ:
@@ -31,8 +31,16 @@ class PhidgetsDAQ:
         
         self.start_time = rospy.Time.now().to_sec()
         
+        
+        # get channel names
+        service_name = '/phidgets_daq/channel_names'
+        rospy.wait_for_service(service_name)
+        self.get_phidgets_daq_channel_names = rospy.ServiceProxy(service_name, phidgetsDAQchannelnames)
+        self.channel_names = self.get_phidgets_daq_channel_names().channels
+        self.channels = [i for i in range(len(self.channel_names))]
+        print 'Channels: ', self.channels
+        
         # parameters 
-        self.channels = [0,1]
         try:
             self.update_rate_ms = rospy.get_param("/phidgets_daq/update_rate_ms")
         except:
@@ -53,8 +61,18 @@ class PhidgetsDAQ:
             self.buffer.setdefault(channel, [])
             
         # publish data  
-        self.publish_data = rospy.Publisher('/phidgets_daq/raw_data', phidgetsDAQmsg)
+        self.publish_data = rospy.Publisher('/phidgets_daq/raw_data', phidgetsDAQmsg, queue_size=3)
 
+    def initialize_digital_outputs(self, phidget):
+        '''
+        subscribes to /phidgets_daq/digital_outputs topic, and connects received messages with setting the output on the phidget
+        '''
+        self.phidget = phidget
+        self.daq_subscription = rospy.Subscriber('/phidgets_daq/digital_output', phidgetsDigitalOutput, self.set_digital_output)
+
+    def set_digital_output(self, digital_output):
+        for i in range(len(digital_output.ports)):
+            self.phidget.setOutputState(digital_output.ports[i], digital_output.states[i])    
     
     def buffer_is_full(self):
         vals = [len(val) for val in self.buffer.values()]
@@ -64,6 +82,10 @@ class PhidgetsDAQ:
             return False
         
     def run(self):
+        '''
+        runs a ros loop that checks for a full buffer (e.g. all analog inputs have new data) at twice the update rate.  
+        the full buffer is then publishes, so all sensor data goes out at the same time.
+        '''
         hz = 1000/(self.update_rate_ms)
         rate = rospy.Rate(2*hz) # check for new values at twice the update rate
         while not rospy.is_shutdown():
@@ -200,5 +222,7 @@ if __name__ == '__main__':
     phidget = connect_to_phidget(phidgets_daq.interfaceKitSensorChanged,
                                  update_rate_ms=phidgets_daq.update_rate_ms, 
                                  channels=phidgets_daq.channels)
+    
+    phidgets_daq.initialize_digital_outputs(phidget)
     phidgets_daq.run()
 

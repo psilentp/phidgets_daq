@@ -28,6 +28,7 @@ class Scope:
         rospy.wait_for_service(service_name)
         self.get_phidgets_daq_channel_names = rospy.ServiceProxy(service_name, phidgetsDAQchannelnames)
         self.channels = self.get_phidgets_daq_channel_names().channels
+        print 'Channels: ', self.channels
         
         # set up axes
         self.axes = {}

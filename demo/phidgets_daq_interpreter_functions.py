@@ -4,6 +4,7 @@ class DAQInterpreter(object):
     def __init__(self):
         self.channel_names = {  0: 'wing_beat_analyzer',
                                 1: 'frequency',
+                                2: 'odor_pulse',
                               }
 
     def interpret_channel(self, channel, value):
@@ -17,5 +18,9 @@ class DAQInterpreter(object):
         return actual_value 
     
     def frequency(self, raw_value):
+        actual_value = (raw_value/1000.)-0.5    
+        return actual_value 
+    
+    def odor_pulse(self, raw_value):
         actual_value = (raw_value/1000.)-0.5    
         return actual_value 

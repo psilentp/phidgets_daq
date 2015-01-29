@@ -34,7 +34,7 @@ class PhidgetDAQInterpreter:
         self.publishers = {}
         for channel in self.interpreter.channel_names.values():
             topic_name = '/phidgets_daq/' + channel
-            p = rospy.Publisher(topic_name, phidgetsDAQinterpreted)
+            p = rospy.Publisher(topic_name, phidgetsDAQinterpreted, queue_size=3)
             self.publishers.setdefault(channel, p)
             
         # set up services (primarily for live plotting)
@@ -64,6 +64,7 @@ class PhidgetDAQInterpreter:
             values.append(data[1])
             if t is None:
                 t = data[0]
+        print t, channels, values
         return [t, channels, values]
     
     def phidgetsDAQchannelnames_callback(self, request):
