@@ -6,6 +6,11 @@ class DAQInterpreter(object):
                                 1: 'frequency',
                                 2: 'odor_pulse',
                               }
+        
+        self.channel_param = { 'wing_beat_analyzer': {'min': 0, 'max': 5},
+                               'frequency': {'min': 0, 'max': 12},
+                               'odor_pulse': {'min': 0, 'max': 1},
+                                }
 
     def interpret_channel(self, channel, value):
         name = self.channel_names[channel]
