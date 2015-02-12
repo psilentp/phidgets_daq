@@ -7,7 +7,7 @@ import rospy
 import rosparam
 from std_msgs.msg import Float32
 from phidgets_daq.msg import phidgetsDAQinterpreted, phidgetsDAQmsg 
-from phidgets_daq.srv import phidgetsDAQservice, phidgetsDAQchannelnames, phidgetsDAQservice_alldata
+from phidgets_daq.srv import phidgetsDAQservice, phidgetsDAQchannelnames, phidgetsDAQservice_alldata#, phidgetsDAQchannelparam
 
 # Other imports
 import imp
@@ -41,6 +41,8 @@ class PhidgetDAQInterpreter:
         self.service_daq = rospy.Service('/phidgets_daq/service', phidgetsDAQservice, self.phidgetsDAQservice_callback)
         self.service_daq_alldata = rospy.Service('/phidgets_daq/service_alldata', phidgetsDAQservice_alldata, self.phidgetsDAQservice_alldata_callback)
         self.service_channelnames = rospy.Service('/phidgets_daq/channel_names', phidgetsDAQchannelnames, self.phidgetsDAQchannelnames_callback)
+        
+        #self.service_channelparam = rospy.Service('/phidgets_daq/channel_param', phidgetsDAQchannelparam, self.phidgetsDAQchannelparam_callback)
             
         # spin it
         rospy.spin()
@@ -53,6 +55,9 @@ class PhidgetDAQInterpreter:
     
     def phidgetsDAQservice_callback(self, request):
         return self.most_recent_data[request.channel]
+    
+    def phidgetsDAQchannelparam(self, request):
+        return self.interpreter.channel_param[request.channel][request.param]
         
     def phidgetsDAQservice_alldata_callback(self, request):
         channels = []

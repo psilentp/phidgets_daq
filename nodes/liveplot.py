@@ -6,6 +6,8 @@ import roslib
 import rospy
 import rosparam
 
+import imp
+
 import numpy as np
 from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
@@ -14,7 +16,8 @@ import matplotlib.animation as animation
 from phidgets_daq.srv import phidgetsDAQservice_alldata, phidgetsDAQchannelnames
 
 class Scope:
-    def __init__(self, fig, maxt=2):
+    def __init__(self, fig, interpreter, maxt=2):
+        self.interpreter = interpreter
         self.maxt = maxt
         self.fig = fig
         
@@ -30,10 +33,14 @@ class Scope:
         self.channels = self.get_phidgets_daq_channel_names().channels
         print 'Channels: ', self.channels
         
+        self.channels = self.get_phidgets_daq_channel_names().channels
+        print 'Channels: ', self.channels
+        
         # set up axes
         self.axes = {}
         for c, channel in enumerate(self.channels):
             ax = fig.add_subplot(len(self.channels), 1, c+1)
+            ax.set_ylim(self.interpreter.channel_param[channel]['min'], self.interpreter.channel_param[channel]['max'])
             self.axes.setdefault(channel, ax)
             
         self.data = {}
@@ -44,7 +51,7 @@ class Scope:
             self.data[channel].setdefault('values', [0])
             self.lines[channel] = Line2D(self.data[channel]['time'], self.data[channel]['values'])
             self.axes[channel].add_line(self.lines[channel])
-            self.axes[channel].set_ylim(-1,1)
+            #self.axes[channel].set_ylim(-1,1)
             self.axes[channel].set_xlim(0, self.maxt)
             self.axes[channel].set_ylabel(channel)
 
@@ -70,8 +77,12 @@ class Scope:
         return lines
 
 if __name__ == '__main__':
+    
+    interpreter_path = rospy.get_param('/phidgets_daq/interpreter_path')
+    phidgets_interpreter = imp.load_source('phidgets_interpreter', interpreter_path)
+    interpreter = phidgets_interpreter.DAQInterpreter()
 
     fig = plt.figure()
-    scope = Scope(fig)
+    scope = Scope(fig, interpreter)
     ani = animation.FuncAnimation(fig, scope.update, interval=20, blit=True)
     plt.show()

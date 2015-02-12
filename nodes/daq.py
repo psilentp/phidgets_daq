@@ -28,12 +28,12 @@ class PhidgetsDAQ:
     def __init__(self):
         rospy.init_node('phidgets_daq', anonymous=True)
         self.previous_update = rospy.Time.now()
-        
         self.start_time = rospy.Time.now().to_sec()
-        
         
         # get channel names
         service_name = '/phidgets_daq/channel_names'
+        print 'Waiting for service: ', service_name
+        print 'If nothing is happening, make sure phidgets_interpreter.py is running'
         rospy.wait_for_service(service_name)
         self.get_phidgets_daq_channel_names = rospy.ServiceProxy(service_name, phidgetsDAQchannelnames)
         self.channel_names = self.get_phidgets_daq_channel_names().channels
@@ -62,7 +62,7 @@ class PhidgetsDAQ:
             
         # publish data  
         self.publish_data = rospy.Publisher('/phidgets_daq/raw_data', phidgetsDAQmsg, queue_size=3)
-
+        
     def initialize_digital_outputs(self, phidget):
         '''
         subscribes to /phidgets_daq/digital_outputs topic, and connects received messages with setting the output on the phidget
@@ -217,7 +217,8 @@ def connect_to_phidget(SensorChangedFunction, update_rate_ms=2, channels=[0,1,2,
     return phidget
 
 if __name__ == '__main__':
-
+    
+    print 'connecting to phidget'
     phidgets_daq = PhidgetsDAQ()
     phidget = connect_to_phidget(phidgets_daq.interfaceKitSensorChanged,
                                  update_rate_ms=phidgets_daq.update_rate_ms, 
