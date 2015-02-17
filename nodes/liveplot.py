@@ -18,7 +18,7 @@ from phidgets_daq.srv import phidgetsDAQservice_alldata, phidgetsDAQchannelnames
 class Scope:
     def __init__(self, fig, interpreter, maxt=2):
         self.interpreter = interpreter
-        self.maxt = maxt
+        self.maxt = interpreter.maxt
         self.fig = fig
         
         # phidgets daq service
