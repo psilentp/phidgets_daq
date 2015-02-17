@@ -213,7 +213,9 @@ def connect_to_phidget(SensorChangedFunction, update_rate_ms=2, channels=[0,1,2,
                 print("Phidget Exception %i: %s" % (e.code, e.details)) 
         
     phidget = interfaceKit
-
+    ratiometric = rospy.get_param("/phidgets_daq/ratiometric", True)
+    phidget.setRatiometric(ratiometric)
+    
     return phidget
 
 if __name__ == '__main__':
