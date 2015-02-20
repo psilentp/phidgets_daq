@@ -29,7 +29,7 @@ class RecordData:
         # recording interval
         self.localtimes_to_record_data = np.arange(0,24)
         self.time_to_sleep_for = 60 # seconds
-        self.last_time_data_recorded = 0
+        self.last_time_data_recorded = time.time()
         
         # phidgets daq service
         service_name = '/phidgets_daq/service_alldata'
@@ -78,12 +78,12 @@ class RecordData:
             diff = np.min( np.abs(self.localtimes_to_record_data - lt_dec) )
             print lt_dec, diff
             if diff < 2*self.time_to_sleep_for/3600.:
-                if (lt_dec - self.last_time_data_recorded) > 4*self.time_to_sleep_for/3600.:
+                if (time.time() - self.last_time_data_recorded) > 4*self.time_to_sleep_for:
                     # save data!
                     print 'saving data!'
                     row = self.collect_row_data_to_write()
                     self.write_row_to_file(row)
-                    self.last_time_data_recorded = lt_dec
+                    self.last_time_data_recorded = time.time()
             
             time.sleep(self.time_to_sleep_for)
         

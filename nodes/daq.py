@@ -125,7 +125,7 @@ class PhidgetsDAQ:
             self.buffer[channel].append(data)
             #print data
             
-def connect_to_phidget(SensorChangedFunction, update_rate_ms=2, channels=[0,1,2,3,4,5,6,7]):
+def connect_to_phidget(SensorChangedFunction, update_rate_ms=2, channels=[0,1,2,3,4,5,6,7], serial_number=None):
     #Create an interfacekit object
     try:
         interfaceKit = InterfaceKit()
@@ -175,7 +175,10 @@ def connect_to_phidget(SensorChangedFunction, update_rate_ms=2, channels=[0,1,2,
     print("Opening phidget object....")
 
     try:
-        interfaceKit.openPhidget()
+        if serial_number is not None:
+            interfaceKit.openPhidget(serial_number)
+        else:
+            interfaceKit.openPhidget()
     except PhidgetException as e:
         print("Phidget Exception %i: %s" % (e.code, e.details))
         print("Exiting....")
