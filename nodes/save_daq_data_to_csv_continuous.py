@@ -13,7 +13,8 @@ from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-from phidgets_daq.srv import phidgetsDAQservice_alldata, phidgetsDAQchannelnames
+from phidgets_daq.msg import phidgetsDAQalldata
+from phidgets_daq.srv import phidgetsDAQchannelnames
 
 import time, os, csv
 
@@ -28,6 +29,8 @@ class RecordData:
         print 'filename: ', self.filename
         self.csvfile = open(os.path.expanduser(self.filename), 'w')
         self.datawrite = csv.writer(self.csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        
+        rospy.init_node('phidget_daq_data_saver', anonymous=True)
         
         # get channel names
         service_name = '/phidgets_daq/channel_names'
@@ -46,8 +49,8 @@ class RecordData:
 
     def save_new_data(self, data):
         row = []
-        row.append(rospy.Time.secs)
-        row.append(rospy.Time.nsecs)
+        row.append(rospy.Time.now().secs)
+        row.append(rospy.Time.now().nsecs)
         row.append(data.time)
         
         channel_data = {}
@@ -57,11 +60,11 @@ class RecordData:
         for channel in self.channels:
             row.append(channel_data[channel])
         
-        self.datawrite.writerow(self.row_data)
+        self.datawrite.writerow(row)
     
     def run(self):
         rospy.spin()
-        self.csvfile.close()
+        #self.csvfile.close()
         
 if __name__ == '__main__':
     record_data = RecordData()

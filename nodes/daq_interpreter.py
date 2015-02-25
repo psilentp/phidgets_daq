@@ -60,7 +60,7 @@ class PhidgetDAQInterpreter:
             data_time = data.time
             channels.append(channel)
             values.append(value)
-        self.publishers('all').publish(data_time, channels, values)
+        self.publishers['all'].publish(data_time, channels, values)
     
     def phidgetsDAQservice_callback(self, request):
         return self.most_recent_data[request.channel]
