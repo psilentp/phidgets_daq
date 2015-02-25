@@ -6,7 +6,7 @@ import roslib
 import rospy
 import rosparam
 from std_msgs.msg import Float32
-from phidgets_daq.msg import phidgetsDAQinterpreted, phidgetsDAQmsg 
+from phidgets_daq.msg import phidgetsDAQinterpreted, phidgetsDAQmsg, phidgetsDAQalldata
 from phidgets_daq.srv import phidgetsDAQservice, phidgetsDAQchannelnames, phidgetsDAQservice_alldata#, phidgetsDAQchannelparam
 
 # Other imports
@@ -36,7 +36,9 @@ class PhidgetDAQInterpreter:
             topic_name = '/phidgets_daq/' + channel
             p = rospy.Publisher(topic_name, phidgetsDAQinterpreted, queue_size=3)
             self.publishers.setdefault(channel, p)
-            
+        p = rospy.Publisher('/phidgets_daq/all_data', phidgetsDAQalldata, queue_size=3)
+        self.publishers.setdefault('all', p)
+        
         # set up services (primarily for live plotting)
         self.service_daq = rospy.Service('/phidgets_daq/service', phidgetsDAQservice, self.phidgetsDAQservice_callback)
         self.service_daq_alldata = rospy.Service('/phidgets_daq/service_alldata', phidgetsDAQservice_alldata, self.phidgetsDAQservice_alldata_callback)
@@ -48,10 +50,17 @@ class PhidgetDAQInterpreter:
         rospy.spin()
         
     def interpret_new_data(self, data):
+        channels = []
+        values = []
+        data_time = None
         for c, raw_value in enumerate(data.data):
             channel, value = self.interpreter.interpret_channel(c, raw_value)
             self.most_recent_data[channel] = [data.time, value]
             self.publishers[channel].publish(data.time, value)
+            data_time = data.time
+            channels.append(channel)
+            values.append(value)
+        self.publishers('all').publish(data_time, channels, values)
     
     def phidgetsDAQservice_callback(self, request):
         return self.most_recent_data[request.channel]
