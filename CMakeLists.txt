@@ -50,6 +50,7 @@ add_message_files(
    phidgetsDAQmsg.msg
    phidgetsDAQinterpreted.msg
    phidgetsDigitalOutput.msg
+   phidgetsDAQalldata.msg
 )
 
 ## Generate services in the 'srv' folder
