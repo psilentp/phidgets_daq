@@ -1,1 +1,1 @@
-'{ports:  [0, 1], states: [1, 0]}'
+rostopic pub /phidgets_daq/digital_output phidgets_daq/phidgetsDigitalOutput '{ports:  [0, 1], states: [1, 0]}'
