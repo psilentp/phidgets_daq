@@ -45,7 +45,7 @@ rospy.sleep(2)
 if config.localtime_start != 'now':
     lt = get_localtime()
     while np.abs(lt - config.localtime_start) > .0005:
-        time.sleep(1)
+        #time.sleep(1)
         lt = get_localtime()
         #print lt
         
