@@ -88,6 +88,7 @@ class PhidgetsDAQ:
         '''
         hz = 1000/(self.update_rate_ms)
         rate = rospy.Rate(2*hz) # check for new values at twice the update rate
+        self.most_recent_data_timestamp = 0
         while not rospy.is_shutdown():
             if self.buffer_is_full():
                 times = []
@@ -96,6 +97,9 @@ class PhidgetsDAQ:
                     data = self.buffer[channel].pop(0)
                     times.append(data[0].to_sec()-self.start_time)
                     values.append(data[1])
+                    if times[-1] - self.most_recent_data_timestamp > self.update_rate_ms*1.1*1e-3:
+                        rospy.logwarn("data collection interval exceeds expected interval of %f. Actual interval: %f", self.update_rate_ms*1e-3, times[-1] - self.most_recent_data_timestamp)
+                self.most_recent_data_timestamp = times[-1]
                     
                 data = [int(v) for v in values]
                 msg = phidgetsDAQmsg(time=np.mean(times), data=data)
@@ -216,7 +220,7 @@ def connect_to_phidget(SensorChangedFunction, update_rate_ms=2, channels=[0,1,2,
                 print("Phidget Exception %i: %s" % (e.code, e.details)) 
         
     phidget = interfaceKit
-    ratiometric = rospy.get_param("/phidgets_daq/ratiometric", True)
+    ratiometric = rospy.get_param("/phidgets_daq/ratiometric", False)
     phidget.setRatiometric(ratiometric)
     
     return phidget
