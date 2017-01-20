@@ -11,6 +11,7 @@ class DAQInterpreter(object):
                                'frequency': {'min': 0, 'max': 12},
                                'odor_pulse': {'min': 0, 'max': 1},
                                 }
+	self.maxt = 30
 
     def interpret_channel(self, channel, value):
         name = self.channel_names[channel]

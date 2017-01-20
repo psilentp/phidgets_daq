@@ -59,21 +59,22 @@ class Scope:
         lines = []
         new_data = self.get_phidgets_data()
         for c, channel in enumerate(new_data.channels):
-                
-            lastt = self.data[channel]['time'][-1]
-            if lastt > self.data[channel]['time'][0] + self.maxt: # reset the arrays
-                self.data[channel]['time'] = [self.data[channel]['time'][-1]]
-                self.data[channel]['values'] = [self.data[channel]['values'][-1]]
-                self.axes[channel].set_xlim(self.data[channel]['time'][0], self.data[channel]['time'][0] + self.maxt)
+            
+            if new_data.time > self.data[channel]['time'][0] + self.maxt: # reset the arrays
+                print new_data.time, self.data[channel]['time'][0], self.maxt
+                self.data[channel]['time'] = [new_data.time]
+                self.data[channel]['values'] = [new_data.values[c]]
+                self.axes[channel].set_xlim(self.data[channel]['time'][0], self.data[channel]['time'][0]+self.maxt)
                 self.axes[channel].figure.canvas.draw()
 
-            
-            self.data[channel]['time'].append(new_data.time)
-            self.data[channel]['values'].append(new_data.values[c])
+            else:
+                self.data[channel]['time'].append(new_data.time)
+                self.data[channel]['values'].append(new_data.values[c])
             
             self.lines[channel].set_data( self.data[channel]['time'], self.data[channel]['values'] )          
             lines.append(self.lines[channel])
-                         
+                     
+             
         return lines
 
 if __name__ == '__main__':
