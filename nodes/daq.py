@@ -94,7 +94,7 @@ class PhidgetsDAQ:
                 values = []
                 for channel in self.channels:
                     data = self.buffer[channel].pop(0)
-                    times.append(data[0].to_sec()-self.start_time)
+                    times.append(data[0].to_sec())#-self.start_time)
                     values.append(data[1])
                     
                 data = [int(v) for v in values]

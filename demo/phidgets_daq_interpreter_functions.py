@@ -2,14 +2,22 @@ import numpy as np
 
 class DAQInterpreter(object):
     def __init__(self):
-        self.channel_names = {  0: 'wing_beat_analyzer',
-                                1: 'frequency',
-                                2: 'odor_pulse',
+        self.channel_names = {  0: 'clock',
+                                1: 'lmr',
+                                2: 'lpr',
+				3: 'freq',
+				4: 'empty',
+				5: 'xpos',
+				6: 'ypos',
                               }
         
-        self.channel_param = { 'wing_beat_analyzer': {'min': 0, 'max': 5},
-                               'frequency': {'min': 0, 'max': 12},
-                               'odor_pulse': {'min': 0, 'max': 1},
+        self.channel_param = { 'clock': {'min': 0, 'max': 5},
+                               'lmr': {'min': 0, 'max': 5},
+			       'lpr': {'min': 0, 'max': 5},
+			       'freq': {'min': 0, 'max': 5},
+                               'empty': {'min': 0, 'max': 5},
+			       'xpos': {'min': 0, 'max': 5},
+			       'ypos': {'min': 0, 'max': 5},
                                 }
 	self.maxt = 30
 
@@ -19,14 +27,30 @@ class DAQInterpreter(object):
         interpreted_value = function(value)
         return name, interpreted_value
     
-    def wing_beat_analyzer(self, raw_value):
+    def clock(self, raw_value):
+        actual_value = (raw_value/1000.)   
+        return actual_value 
+
+    def lmr(self, raw_value):
         actual_value = (raw_value/1000.)   
         return actual_value 
     
-    def frequency(self, raw_value):
-        actual_value = (raw_value/1000.)-0.5    
+    def lpr(self, raw_value):
+        actual_value = (raw_value/1000.)   
+        return actual_value 
+
+    def freq(self, raw_value):
+        actual_value = (raw_value/1000.)   
         return actual_value 
     
-    def odor_pulse(self, raw_value):
-        actual_value = (raw_value/1000.)-0.5    
+    def empty(self, raw_value):
+        actual_value = (raw_value)   
+        return actual_value 
+    
+    def xpos(self, raw_value):
+        actual_value = (raw_value)    
+        return actual_value 
+    
+    def ypos(self, raw_value):
+        actual_value = (raw_value)    
         return actual_value 
