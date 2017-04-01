@@ -4,8 +4,8 @@ class DAQInterpreter(object):
     def __init__(self):
         self.channel_names = {  0: 'clock',
                                 1: 'lmr',
-                                2: 'lpr',
-				3: 'freq',
+                                2: 'freq',
+				3: 'lpr',
 				4: 'empty',
 				5: 'xpos',
 				6: 'ypos',
