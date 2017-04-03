@@ -28,19 +28,19 @@ class DAQInterpreter(object):
         return name, interpreted_value
     
     def clock(self, raw_value):
-        actual_value = (raw_value/1000.)   
+        actual_value = (raw_value/2.)   
         return actual_value 
 
     def lmr(self, raw_value):
-        actual_value = (raw_value/1000.)   
+        actual_value = (raw_value/2.)   
         return actual_value 
     
     def lpr(self, raw_value):
-        actual_value = (raw_value/1000.)   
+        actual_value = (raw_value/2.)   
         return actual_value 
 
     def freq(self, raw_value):
-        actual_value = (raw_value/1000.)   
+        actual_value = (raw_value/2.)   
         return actual_value 
     
     def empty(self, raw_value):
